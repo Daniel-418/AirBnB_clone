@@ -2,6 +2,7 @@
 """This module contains the BaseModel class"""
 from datetime import datetime
 import uuid
+from models.__init__ import storage
 
 
 class BaseModel():
@@ -23,6 +24,9 @@ class BaseModel():
             if key == 'created_at' or key == 'updated_at':
                 value = datetime.fromisoformat(value)
                 setattr(self, key, value)
+
+        if not kwargs:
+            storage.new(self)
 
     def __str__(self):
         """
@@ -52,3 +56,4 @@ class BaseModel():
         Updates the updated_at attribute of this object
         """
         self.updated_at = datetime.now()
+        storage.save()
