@@ -43,15 +43,91 @@ class HBNBCommand(cmd.Cmd):
             else:
                 print("** class does not exists **")
 
+    def do_destroy(self, line):
+        """
+        destroys an object
+        """
+        if line:
+            objects = storage.all()
+            arguments = line.split()
+
+            if arguments[0] not in self.classes:
+                print("** class doesn't exist **")
+                return
+
+            if len(arguments) < 2:
+                print("** instance id missing **")
+                return
+
+            key = "{}.{}".format(arguments[0], arguments[1])
+            if key not in objects:
+                print("** no instance found **")
+            else:
+                del objects[key]
+                storage.save()
+            
+        else:
+            print("** class name is missing **")
+
+    def help_destroy(self):
+        """
+        Help method for the destroy command
+        """
+        print("Usage: destroy [class name] [id]")
+        print("destroys an object")
+
+    def do_all(self, line):
+        """
+        method to print all the objects in memory
+        """
+        objects = storage.all()
+        final_list = []
+        
+        if line and line not in self.classes:
+            print("** class does not exist **")
+            return
+
+        for key, obj_data in objects.items():
+            obj_class_name = key.split(".")[0]
+            if not line or line == obj_class_name:
+                if obj_class_name in self.classes:
+                    obj = self.classes[obj_class_name](**obj_data)
+                    final_list.append(str(obj))
+                else:
+                    print("** class does not exist **")
+                    return
+
+        print(final_list)
+
+    def do_update(self, line):
+        """
+        updates the specified attributes of an object
+        """
+        pass
+
+    def help_update(self):
+        """
+        help method for the update class
+        """
+        print("Usage: update [class name] [id] [attribute name] [attribute value]")
+        print("Updates the attributes of a class")
+
+    def help_all(self):
+        """
+        Help method for the all command
+        """
+        print("Usage: all [class name]\nor\nUsage: all")
+        print("prints all the objects based on the classname or not")
+
     def do_show(self, line):
         """
         Shows the string representation of an object
         """
-        objects = storage.all()
         if line == "":
             print("** class name is missing **")
             return
 
+        objects = storage.all()
         words = line.split()
         if words[0] not in self.classes:
             print("** class doesn't exists **")
