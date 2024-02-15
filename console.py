@@ -10,6 +10,7 @@ from models.place import Place
 from models.review import Review
 from models.__init__ import storage
 import sys
+import shlex
 
 
 class HBNBCommand(cmd.Cmd):
@@ -19,12 +20,12 @@ class HBNBCommand(cmd.Cmd):
     prompt = '(hbnb) '
 
     classes = {"BaseModel": BaseModel,
-            "User": User,
-            "State": State
-            "City": City
-            "Amenity": Amenity
-            "Place": Place
-            "Review": Review}
+               "User": User,
+               "State": State,
+               "City": City,
+               "Amenity": Amenity,
+               "Place": Place,
+               "Review": Review}
 
     def do_quit(self, line):
         """
@@ -77,7 +78,7 @@ class HBNBCommand(cmd.Cmd):
             else:
                 del objects[key]
                 storage.save()
-            
+
         else:
             print("** class name is missing **")
 
@@ -94,7 +95,7 @@ class HBNBCommand(cmd.Cmd):
         """
         objects = storage.all()
         final_list = []
-        
+
         if line and line not in self.classes:
             print("** class does not exist **")
             return
@@ -113,47 +114,40 @@ class HBNBCommand(cmd.Cmd):
 
     def do_update(self, line):
         """
-        updates the specified attributes of an object
+        Updates an instance based on the class name and id
+        by adding or updating attribute
         """
-        if not line:
-            print("** class name is missing **")
-            return
-
-        args = line.split()
-        args_len = len(args)
-        objects = storage.all()
-
-        if args[0] not in self.classes:
-            print("** class does not exist **")
-            return
-
-        if args_len == 1:
+        arguments = line.split() if line else []
+        if not arguments:
+            print("** class name missing **")
+        elif arguments[0] not in self.classes:
+            print("** class doesn't exist **")
+        elif len(arguments) == 1:
             print("** instance id missing **")
-            return
-
-        key = "{}.{}".format(args[0], args[1])
-        if key not in objects:
-            print("** no instance found **")
-            return
-
-        if args_len == 2:
-            print("** attribute name missing **")
-            return
-
-        if args_len == 3:
-            print("** value missing **")
-            return
-
-        attr_dict = objects[key]
-        attr_dict[args[2]] = eval(args[3])
-        storage.save()
-
+        else:
+            objects_dict = storage.all()
+            search_key = arguments[0] + "." + arguments[1]
+            if search_key not in objects_dict:
+                print("** no instance found **")
+            elif len(arguments) == 2:
+                print("** attribute name missing **")
+            elif len(arguments) == 3:
+                print("** value missing **")
+            else:
+                attr_name = arguments[2]
+                val_type = type(arguments[3])
+                attr_value = val_type(arguments[3])
+                obj_dict = objects_dict[search_key]
+                value = arguments[3].strip('"').strip("'")
+                obj_dict[attr_name] = val_type(value)
+                storage.save()
 
     def help_update(self):
         """
         help method for the update class
         """
-        print("Usage: update [class name] [id] [attribute name] [attribute value]")
+        print("Usage: update [class name] [id]" +
+              "[attribute name] [attribute value]")
         print("Updates the attributes of a class")
 
     def help_all(self):
@@ -188,7 +182,6 @@ class HBNBCommand(cmd.Cmd):
         instance = self.classes[words[0]](**objects[object_key])
         print(instance)
 
-
     def help_show(self):
         """
         Help for the show command
@@ -201,5 +194,7 @@ class HBNBCommand(cmd.Cmd):
 
     def help_create(self):
         print("Usage: create [class name]\nCreates a class")
+
+
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
