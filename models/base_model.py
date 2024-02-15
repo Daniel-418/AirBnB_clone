@@ -11,11 +11,11 @@ class BaseModel():
 
     def __init__(self, *args, **kwargs):
         """Initializes a new instance"""
-        if not 'id' in kwargs:
+        if 'id' not in kwargs:
             self.id = str(uuid.uuid4())
-        if not 'created_at' in kwargs:
+        if 'created_at' not in kwargs:
             self.created_at = datetime.now()
-        if not 'updated_at' in kwargs:
+        if 'updated_at' not in kwargs:
             self.updated_at = datetime.now()
 
         for key, value in kwargs.items():
@@ -34,7 +34,8 @@ class BaseModel():
         Return
             str: The string representation of this object
         """
-        return "[{}] ({}) {}".format(self.__class__.__name__, self.id, self.__dict__)
+        return "[{}] ({}) {}".format(self.__class__.__name__,
+                                     self.id, self.__dict__)
 
     def to_dict(self):
         """

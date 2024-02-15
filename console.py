@@ -2,6 +2,12 @@
 """Entry point for the console"""
 import cmd
 from models.base_model import BaseModel
+from models.user import User
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.place import Place
+from models.review import Review
 from models.__init__ import storage
 import sys
 
@@ -12,7 +18,13 @@ class HBNBCommand(cmd.Cmd):
     """
     prompt = '(hbnb) '
 
-    classes = {"BaseModel": BaseModel}
+    classes = {"BaseModel": BaseModel,
+            "User": User,
+            "State": State
+            "City": City
+            "Amenity": Amenity
+            "Place": Place
+            "Review": Review}
 
     def do_quit(self, line):
         """
@@ -103,7 +115,39 @@ class HBNBCommand(cmd.Cmd):
         """
         updates the specified attributes of an object
         """
-        pass
+        if not line:
+            print("** class name is missing **")
+            return
+
+        args = line.split()
+        args_len = len(args)
+        objects = storage.all()
+
+        if args[0] not in self.classes:
+            print("** class does not exist **")
+            return
+
+        if args_len == 1:
+            print("** instance id missing **")
+            return
+
+        key = "{}.{}".format(args[0], args[1])
+        if key not in objects:
+            print("** no instance found **")
+            return
+
+        if args_len == 2:
+            print("** attribute name missing **")
+            return
+
+        if args_len == 3:
+            print("** value missing **")
+            return
+
+        attr_dict = objects[key]
+        attr_dict[args[2]] = eval(args[3])
+        storage.save()
+
 
     def help_update(self):
         """

@@ -3,6 +3,7 @@ from models.base_model import BaseModel
 from datetime import datetime
 import unittest
 
+
 class TestBaseModel(unittest.TestCase):
     """Test module class"""
 
@@ -58,7 +59,6 @@ class TestBaseModel(unittest.TestCase):
         obj_dict2 = obj.to_dict()
         self.assertEqual(obj_dict2, obj_dict)
 
-
     def test_save(self):
         """
         Test the object updated at time is updated when
@@ -85,11 +85,11 @@ class TestBaseModel(unittest.TestCase):
         self.assertTrue(hasattr(obj, 'id'))
         self.assertTrue(hasattr(obj, 'created_at'))
         self.assertTrue(hasattr(obj, 'updated_at'))
-        
+
         dictionary = {'size': 32, 'created_at': datetime.now().isoformat(),
-                'id': 1, 'updated_at': datetime.now().isoformat()}
+                      'id': 1, 'updated_at': datetime.now().isoformat()}
         obj1 = BaseModel(**dictionary)
-        
+
         for i in dictionary:
             self.assertTrue(hasattr(obj1, i))
         self.assertIsInstance(obj.created_at, datetime)
