@@ -1,10 +1,12 @@
 #!/usr/bin/python3
 """
-This module contains the Amenity class
+Amenity Module
 """
 from models.base_model import BaseModel
 
 
 class Amenity(BaseModel):
-    """This is the Amenity class"""
+    """
+    Inherits from the BaseModel
+    """
     name = ""

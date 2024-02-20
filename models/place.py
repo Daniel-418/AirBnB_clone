@@ -1,15 +1,17 @@
 #!/usr/bin/python3
 """
-This module contains the City class
+Place Module
 """
 from models.base_model import BaseModel
 
 
 class Place(BaseModel):
-    """This is the Place class"""
-    name = ""
+    """
+    Inherits from the BaseModel
+    """
     city_id = ""
     user_id = ""
+    name = ""
     description = ""
     number_rooms = 0
     number_bathrooms = 0
@@ -17,4 +19,4 @@ class Place(BaseModel):
     price_by_night = 0
     latitude = 0.0
     longitude = 0.0
-    amemity_ids = []
+    amenity_ids = []

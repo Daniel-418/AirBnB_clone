@@ -1,11 +1,13 @@
 #!/usr/bin/python3
 """
-This module contains the Cith class
+City Module
 """
 from models.base_model import BaseModel
 
 
 class City(BaseModel):
-    """This is the City class"""
-    name = ""
+    """
+    Inherits from the BaseModel
+    """
     state_id = ""
+    name = ""

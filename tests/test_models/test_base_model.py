@@ -1,102 +1,108 @@
-"""unnitest module for the file base_model.py"""
+#!/usr/bin/python3
+"""
+Test Cases for Base Model
+"""
+import unittest
+import pep8
+from io import StringIO
 from models.base_model import BaseModel
 from datetime import datetime
-import unittest
+import models
 
 
 class TestBaseModel(unittest.TestCase):
-    """Test module class"""
-
-    def test_instatiation_attributes(self):
-        """Test that an instance has all the required attributes"""
-        obj1 = BaseModel()
-        self.assertTrue(hasattr(obj1, 'id'))
-        self.assertTrue(hasattr(obj1, 'created_at'))
-        self.assertTrue(hasattr(obj1, 'updated_at'))
-        self.assertIsInstance(obj1.id, str)
-        self.assertIsInstance(obj1.updated_at, datetime)
-        self.assertIsInstance(obj1.created_at, datetime)
-
-    def test_str(self):
+    """
+    All test cases for base model
+    """
+    """
+     Test to check for data types
+    """
+    def setUp(self):
         """
-        Tests the __str__ method of BaseModel
+        Base Model instances
         """
-        obj = BaseModel()
-        obj_str = obj.__str__()
-        self.assertIn('BaseModel', obj_str)
-        self.assertIn('({})'.format(obj.id), obj_str)
-        self.assertIn(str(obj.__dict__), obj_str)
-        self.assertIsInstance(obj_str, str)
+        self.base = BaseModel()
+        self.base.level = "300"
+        self.base.dept = "MLS"
 
-    def test_to_dict(self):
+        baseKwargs = self.base.to_dict()
+        self.newBase = BaseModel(**baseKwargs)
+
+    def tearDown(self):
         """
-        Tests the to_dict() method of BaseModel
+        Tear Down
         """
-        obj = BaseModel()
-        obj.name = "My First Model"
-        obj.number = 89
-        obj_dict = obj.to_dict()
+        pass
 
-        self.assertIn('id', obj_dict)
-        self.assertIsInstance(obj_dict['id'], str)
-        self.assertIn('created_at', obj_dict)
-        self.assertIsInstance(obj_dict['created_at'], str)
-        self.assertIn('updated_at', obj_dict)
-        self.assertIsInstance(obj_dict['updated_at'], str)
+    def test_id_str(self):
+        """
+        Checks that id is string
+        """
+        self.assertTrue(type(self.base.id) == str)
 
-        self.assertIn('name', obj_dict)
-        self.assertEqual(obj_dict['name'], "My First Model")
-        self.assertIn('number', obj_dict)
-        self.assertEqual(obj_dict['number'], 89)
+    def test_created_at_date(self):
+        """
+        Checks that created_at is a datetime attribute
+        """
+        self.assertTrue(type(self.base.created_at) == datetime)
 
-        self.assertIn('__class__', obj_dict)
-        self.assertEqual(obj_dict['__class__'], obj.__class__.__name__)
-        self.assertNotIn('__class__', obj.__dict__)
-
-        for key in obj.__dict__:
-            self.assertIn(key, obj_dict)
-
-        obj_dict2 = obj.to_dict()
-        self.assertEqual(obj_dict2, obj_dict)
+    def test_updated_at_date(self):
+        """
+        Checks that updated_at is a datetime attribute
+        """
+        self.assertTrue(type(self.base.updated_at) == datetime)
 
     def test_save(self):
         """
-        Test the object updated at time is updated when
-        save is called.
+        Test the time difference between created_at and
+        updated_at
         """
-        basemodel = BaseModel()
-        dict_1 = basemodel.to_dict()
-        updated_at_value1 = basemodel.updated_at
+        all_objects = models.storage.all()
+        self.base.save()
+        key = "BaseModel" + '.' + self.base.id
+        self.assertGreater(self.base.updated_at, self.base.created_at)
+        self.assertNotEqual(self.base.updated_at, self.base.created_at)
+        self.assertIn(key, all_objects)
 
-        basemodel.save()
-        dict_2 = basemodel.to_dict()
-        updated_at_value2 = basemodel.updated_at
-
-        self.assertIsInstance(updated_at_value1, datetime)
-        self.assertIsInstance(updated_at_value1, datetime)
-        self.assertNotEqual(updated_at_value1, updated_at_value2)
-        self.assertNotEqual(dict_1['updated_at'], dict_2['updated_at'])
-
-    def test__init__(self):
+    def test_to_dict(self):
         """
-        Test the constructor of a BaseModel object
+        Check for the presence of keys in the dictionary
         """
-        obj = BaseModel()
-        self.assertTrue(hasattr(obj, 'id'))
-        self.assertTrue(hasattr(obj, 'created_at'))
-        self.assertTrue(hasattr(obj, 'updated_at'))
+        self.base.name = "Jeniffer"
+        self.base.age = 29
+        baseDict = self.base.to_dict()
+        self.assertIn('created_at', baseDict)
+        self.assertIn('id', baseDict)
+        self.assertIn('updated_at', baseDict)
+        self.assertIn('__class__', baseDict)
+        self.assertIn('name', baseDict)
+        self.assertIn('age', baseDict)
 
-        dictionary = {'size': 32, 'created_at': datetime.now().isoformat(),
-                      'id': 1, 'updated_at': datetime.now().isoformat()}
-        obj1 = BaseModel(**dictionary)
+        self.assertTrue(isinstance(baseDict, dict))
 
-        for i in dictionary:
-            self.assertTrue(hasattr(obj1, i))
-        self.assertIsInstance(obj.created_at, datetime)
-        self.assertIsInstance(obj.updated_at, datetime)
+    def test_kwargs_attr(self):
+        """
+        Checks for the presence of attributes in an object
+        created from kwargs
+        """
+        self.assertIn('id', self.newBase.__dict__)
+        self.assertIn('created_at', self.newBase.__dict__)
+        self.assertIn('updated_at', self.newBase.__dict__)
+        self.assertIn('level', self.newBase.__dict__)
+        self.assertIn('dept', self.newBase.__dict__)
+        self.assertNotIn('__class__', self.newBase.__dict__)
 
-        dictionary['__class__'] = 'sample class'
-        obj2 = BaseModel("Daniel", 2, **dictionary)
-        self.assertNotEqual(obj2.__class__, 'sample class')
-        self.assertFalse(hasattr(obj2, '2'))
-        self.assertFalse(hasattr(obj2, 'Daniel'))
+    def test_datetime_from_kwargs(self):
+        """
+        checks the data type of created_at and
+        updated_at from kwargs
+        """
+        self.assertTrue(type(self.newBase.created_at), datetime)
+        self.assertTrue(type(self.newBase.updated_at), datetime)
+
+    def test_pep8_base_model(self):
+        """Test that we conform to PEP8."""
+        pep8style = pep8.StyleGuide(quiet=True)
+        result = pep8style.check_files(['models/base_model.py'])
+        self.assertEqual(result.total_errors, 0,
+                         "Found code style errors (and warnings).")
