@@ -238,7 +238,7 @@ class HBNBCommand(cmd.Cmd):
                 obj_id = update_args[0].strip('"')
                 if len(update_args) == 2 and update_args[1].startswith("{"):
                     attr_dict = eval(update_args[1])
-                    for key, value in attr_dict:
+                    for key, value in attr_dict.items():
                         self.do_update("{} {} {} {}".format(
                             cls, obj_id, key, value))
                 else:
